@@ -1,0 +1,86 @@
+<!-- reserve.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>영화 예매</title>
+    <link rel="stylesheet" href="assets/styles/main.css" />
+    <link rel="stylesheet" href="assets/styles/reserveTab.css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="assets/scripts/user.js"></script>
+    <script src="assets/scripts/main.js" defer></script>
+    <script src="assets/scripts/reserve.js" defer></script>
+  </head>
+  <body>
+    <div class="container">
+      <!-- 공통 헤더 -->
+      <div id="header-container"></div>
+
+      <div class="reserve-container">
+        <!-- 지역 선택 탭 -->
+        <div id="region-selection" class="reserve-section">
+          <h2>영화관을 선택해주세요</h2>
+          <div class="region-tabs">
+            <div class="region-tab active" data-region="seoul">서울</div>
+            <div class="region-tab" data-region="gyeonggi">경기</div>
+            <div class="region-tab" data-region="incheon">인천</div>
+            <div class="region-tab" data-region="busan">부산</div>
+          </div>
+          <div class="theater-list">
+            <!-- 극장 목록이 동적으로 로드됨 -->
+          </div>
+          <div class="button-group">
+            <button id="next-to-movie" class="next-btn" disabled>다음</button>
+          </div>
+        </div>
+
+        <!-- 영화 선택 섹션 -->
+        <div id="movie-selection" class="reserve-section" style="display: none;">
+          <h2>영화를 선택해주세요</h2>
+          <div class="movie-list">
+            <!-- 영화 목록이 동적으로 로드됨 -->
+          </div>
+          <div class="time-table">
+            <!-- 상영 시간표가 동적으로 로드됨 -->
+          </div>
+          <div class="person-selection">
+            <h3>인원 선택</h3>
+            <div class="person-count">
+              <button class="count-btn minus">-</button>
+              <span id="person-count">1</span>
+              <button class="count-btn plus">+</button>
+            </div>
+          </div>
+          <div class="button-group">
+            <button id="prev-to-region" class="prev-btn">이전</button>
+            <button id="next-to-seat" class="next-btn" disabled>다음</button>
+          </div>
+        </div>
+
+        <!-- 좌석 선택 섹션 -->
+        <div id="seat-selection" class="reserve-section" style="display: none;">
+          <h2>좌석을 선택해주세요</h2>
+          <div class="selected-movie-info">
+            <div class="movie-title"></div>
+            <div class="person-count-info"></div>
+          </div>
+          <div class="theater-info">
+            <span class="theater-number"></span>
+            <span class="showtime"></span>
+          </div>
+          <div class="screen">SCREEN</div>
+          <div class="seat-container">
+            <!-- 좌석이 동적으로 로드됨 -->
+          </div>
+          <div class="seat-info">
+            <div class="selected-seats"></div>
+            <div class="total-price"></div>
+          </div>
+          <div class="button-group">
+            <button id="prev-to-movie" class="prev-btn">이전</button>
+            <button id="complete-reservation" class="next-btn" disabled>예매하기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

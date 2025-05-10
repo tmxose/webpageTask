@@ -1,0 +1,231 @@
+// user.js
+
+// 사용자 관련 상수
+const POINT_CODES = {
+    'POINT1000': 1000,
+    'POINT10000': 10000,  // 1만 포인트 충전 코드
+    'POINT100000': 100000 // 10만 포인트 충전 코드
+};
+
+//  전체 사용자 데이터 저장
+function saveUsers(users) {
+  localStorage.setItem("users", JSON.stringify(users));
+}
+
+//   전체 사용자 데이터 가져오기
+function getUsers() {
+  return JSON.parse(localStorage.getItem("users")) || [];
+}
+
+//   로그인한 사용자 ID 저장
+function setCurrentUser(username) {
+  localStorage.setItem("currentUser", username);
+}
+
+//   로그인한 사용자 ID 가져오기
+function getCurrentUser() {
+  if (sessionStorage.getItem('isLoggedIn') === 'true') {
+    return sessionStorage.getItem('currentUser');
+  }
+  return null;
+}
+
+//   로그인한 사용자 정보 가져오기
+function getCurrentUserInfo() {
+  const users = getUsers();
+  const currentUser = getCurrentUser();
+  return users.find((u) => u.username === currentUser);
+}
+
+//   회원가입 함수
+function register() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+
+  const users = getUsers();
+
+  // 아이디 중복 체크
+  if (users.some((u) => u.username === username)) {
+    alert("이미 존재하는 아이디입니다.");
+    return;
+  }
+
+  // 새 사용자 추가
+  const newUser = {
+    username,
+    password,
+    name,
+    email,
+    points: 0,
+  };
+
+  users.push(newUser);
+  saveUsers(users);
+
+  alert("회원가입 완료! 로그인 페이지로 이동합니다.");
+  // 로그인 페이지로 이동
+  location.href = "login.html";
+}
+
+//   로그인 함수
+function login() {
+  const id = document.getElementById('login-id').value;
+  const pw = document.getElementById('login-pw').value;
+ 
+  const users = getUsers();
+  const user = users.find(u => u.username === id && u.password === pw);
+  if (user) {
+    sessionStorage.setItem('isLoggedIn', 'true');
+    sessionStorage.setItem('currentUser', id);
+    alert("로그인 성공!");
+    location.href = "main.html";
+  } else {
+    alert("아이디 또는 비밀번호가 틀렸습니다.");
+  }
+}
+
+
+//   사용자 정보 업데이트 함수 (ex: 마이페이지에서 사용)
+function updateUserInfo() {
+  const user = getCurrentUserInfo();
+  const infoP = document.getElementById("info");
+  console.log(user);
+  if (user && infoP) {
+    infoP.innerHTML = `환영합니다, ${user.name}님 (보유 포인트: ${user.points}P)`;
+    console.log(user.points);
+  }
+}
+//   로그아웃 함수
+function logout() {
+  sessionStorage.removeItem('isLoggedIn');
+  sessionStorage.removeItem('currentUser');
+  alert("로그아웃되었습니다.");
+  location.href = "main.html"; // 메인으로 이동
+}
+// 메인 페이지 이동함수
+function goMainPage() {
+  location.href = "main.html";
+}
+
+//   페이지 로드 시 로그인 상태 반영
+$(document).ready(function() {
+  function updateUserInterface() {
+    const loginUl = document.querySelector("#header-logo ul");
+    const user = getCurrentUserInfo();
+    //console.log("현재 사용자 정보:", user); // 디버깅용
+
+    if (user && loginUl) {
+      loginUl.innerHTML = `
+        <li><a href="mypage.html">마이페이지</a></li>
+        <li><a href="#" onclick="logout()">로그아웃</a></li>
+      `;
+
+      // 메인 페이지나 마이페이지에 사용자 정보 표시
+      const userInfoDiv = document.getElementById("user-info");
+      if (userInfoDiv) {
+        userInfoDiv.innerText = `환영합니다, ${user.name}님 (보유 포인트: ${user.points}P)`;
+      }
+    }
+  }
+
+  // 헤더 로드 완료 후 실행
+  $("#header-container").load("header.html", function() {
+    updateUserInfo();
+    updateUserInterface();
+  });
+});
+
+// 포인트 충전
+function chargePoints(username, pointCode) {
+    const users = getUsers();
+    const userIndex = users.findIndex(user => user.username === username);
+    
+    if (userIndex === -1) return false;
+    
+    // 포인트 코드 검증
+    if (!(pointCode in POINT_CODES)) {
+        return false;
+    }
+    
+    // 포인트 충전
+    const points = POINT_CODES[pointCode];
+    users[userIndex].points = (users[userIndex].points || 0) + points;
+    saveUsers(users);
+    return true;
+}
+
+// 포인트 충전 코드 확인
+function validatePointCode(code) {
+    return POINT_CODES.hasOwnProperty(code);
+}
+
+// 회원가입 처리
+function signup(username, password, email) {
+    const users = getUsers();
+    
+    // 이미 존재하는 사용자인지 확인
+    if (users.some(user => user.username === username)) {
+        return false;
+    }
+    
+    // 새 사용자 추가
+    users.push({
+        username,
+        password,
+        email,
+        points: 0,
+        reservations: []
+    });
+    
+    saveUsers(users);
+    return true;
+}
+
+// 예매 정보 저장
+function saveReservation(reservation) {
+    const users = getUsers();
+    const userIndex = users.findIndex(user => user.username === reservation.userId);
+    
+    if (userIndex !== -1) {
+        users[userIndex].reservations.push(reservation);
+        saveUsers(users);
+        return true;
+    }
+    return false;
+}
+
+// 사용자의 예매 내역 가져오기
+function getUserReservations(username) {
+    const users = getUsers();
+    const user = users.find(u => u.username === username);
+    return user ? user.reservations : [];
+}
+
+// 로그인 상태 체크
+function checkLoginStatus() {
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+        location.href = 'login.html';
+        return false;
+    }
+    return true;
+}
+
+// 네비게이션 동적 렌더링
+function renderNavLinks() {
+    const navLinks = document.querySelector('.nav-links');
+    if (!navLinks) return;
+    navLinks.innerHTML = '';
+    navLinks.innerHTML += '<li><a href="index.html">홈</a></li>';
+    navLinks.innerHTML += '<li><a href="reserve.html">예매</a></li>';
+    if (sessionStorage.getItem('isLoggedIn') === 'true') {
+        navLinks.innerHTML += '<li><a href="mypage.html">마이페이지</a></li>';
+        navLinks.innerHTML += '<li><a href="#" onclick="logout()">로그아웃</a></li>';
+    } else {
+        navLinks.innerHTML += '<li><a href="login.html">로그인</a></li>';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', renderNavLinks);

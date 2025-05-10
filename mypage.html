@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지</title>
+    <link rel="stylesheet" href="assets/styles/mypage.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="assets/scripts/user.js"></script>
+    <script src="assets/scripts/mypage.js"></script>
+  </head>
+  <body>
+    <div class="container main-bg">
+      <header class="mypage-header">
+        <div class="mypage-header-inner fixed-width">
+          <a href="main.html" class="mypage-logo-link">레드 시네마</a>
+          <nav class="mypage-nav">
+            <a href="main.html">메인페이지</a>
+            <a href="#" onclick="logout();return false;">로그아웃</a>
+          </nav>
+        </div>
+      </header>
+      <main>
+        <div class="mypage-container fixed-width">
+          <div class="user-info">
+            <h2>회원 정보</h2>
+            <div class="info-item">
+              <span>아이디:</span>
+              <span id="username"></span>
+            </div>
+            <div class="info-item">
+              <span>이메일:</span>
+              <span id="email"></span>
+            </div>
+            <div class="info-item">
+              <span>보유 포인트:</span>
+              <span id="points"></span>
+            </div>
+          </div>
+
+          <div class="point-charge">
+            <h2>포인트 충전</h2>
+            <div class="charge-form">
+              <input type="text" id="point-code" placeholder="포인트 충전 코드를 입력하세요">
+              <button id="charge-points">충전하기</button>
+            </div>
+            <div class="point-codes">
+              <h3>포인트 충전 코드</h3>
+              <ul>
+                <li>POINT10000: 1만 포인트</li>
+                <li>POINT100000: 10만 포인트</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="reservation-history">
+            <h2>예매 내역</h2>
+            <div id="reservation-list"></div>
+          </div>
+        </div>
+      </main>
+      <footer>
+        <p>&copy; 2024 레드 시네마. All rights reserved.</p>
+      </footer>
+    </div>
+  </body>
+</html>
