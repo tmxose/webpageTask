@@ -637,10 +637,13 @@ h1 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     background-color: #ff4444;
 }
-.movie-container{
+
+.movie-container {
+    margin: 10px;
     width: 100%;
     box-sizing: border-box;
 }
+
 .inner-movie-container {
     display: flex;
     justify-content: center;
@@ -648,6 +651,8 @@ h1 {
     align-items: center;
     padding: 10px;
     width: 100%;
+    box-sizing: border-box;
+    background-color: rgba(40, 40, 40, 0.95);
 }
 
 /* 영화 항목 스타일 */
@@ -661,20 +666,21 @@ h1 {
     margin: 30px;
     width: 70%;
     background-color: #1e1e1e;
-
 }
-.movie-poster2{
+
+.movie-poster2 {
     margin: 10px 20px;
     width: 300px;
     height: 400px;
 }
-.movie-info-text{
+
+.movie-info-text {
     width: 300px;
     padding-top: 30px;
 }
 
 /*이벤트 탭 크기조정*/
-.event-container{
+.event-container {
     width: 100%;
     box-sizing: border-box;
 }
