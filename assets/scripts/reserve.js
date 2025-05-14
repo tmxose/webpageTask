@@ -153,7 +153,12 @@ function loadMovies() {
         { id: 1, title: '진격의 거인', poster: 'movie1.png' },
         { id: 2, title: '미키17', poster: 'movie2.jpg' },
         { id: 3, title: '침범', poster: 'movie3.jpg' },
-        { id: 4, title: '콘클라베', poster: 'movie4.jpg' }
+        { id: 4, title: '콘클라베', poster: 'movie4.jpg' },
+
+        { id: 5, title: '로비', poster: 'movie5.jpg' },
+        { id: 6, title: '기동전사 건담 지쿠악스 비기닝', poster: 'movie6.jpg' },
+        { id: 7, title: '아마추어', poster: 'movie7.jpg' },
+        { id: 8, title: '배러맨', poster: 'movie8.jpg' }
     ];
 
     const movieList = $('.movie-list');

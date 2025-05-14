@@ -1,30 +1,35 @@
 body {
-  margin: 0;
-  background-color: #1a1a1a;
-  color: #ffffff;
-  font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
 .container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0;
-  border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+    border-radius: 8px;
 }
 
 h1 {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
-.reserve-container, .movie-container, .theater-container, .event-container, .login-container, .signup-container {
-  padding: 20px;
-  background-color: rgba(40, 40, 40, 0.95);
-  border-radius: 10px;
+.reserve-container,
+.movie-container,
+.combo-container,
+.event-container,
+.login-container,
+.signup-container {
+    padding: 20px;
+    background-color: rgba(40, 40, 40, 0.95);
+    border-radius: 10px;
 }
 
 .reserve-container {
@@ -47,7 +52,7 @@ h1 {
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     color: #ffffff;
     gap: 20px;
 }
@@ -72,7 +77,7 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 20px;
-   /*  max-height: 600px;
+    /*  max-height: 600px;
     overflow-y: auto; */
     padding-right: 10px;
 }
@@ -187,7 +192,8 @@ h1 {
     gap: 20px;
 }
 
-.next-btn, .prev-btn {
+.next-btn,
+.prev-btn {
     padding: 15px;
     color: white;
     border: none;
@@ -222,17 +228,26 @@ h1 {
     transform: none;
     box-shadow: none;
 }
+
 .seat-section {
     display: flex;
-    flex-direction: column; /* 세로 방향으로 정렬 */
-    justify-content: center; /* 중앙 정렬 */
-    align-items: center; /* 수평 중앙 정렬 */
+    flex-direction: column;
+    /* 세로 방향으로 정렬 */
+    justify-content: center;
+    /* 중앙 정렬 */
+    align-items: center;
+    /* 수평 중앙 정렬 */
     width: 100%;
-    padding: 20px; /* 여백 추가 */
-    border: 1px solid #ccc; /* 테두리 추가 */
-    border-radius: 8px; /* 모서리 둥글게 */
-    margin: 10px; /* 외부 여백 */
-    background: rgba(40, 40, 40, 0.95);/* 배경색 */
+    padding: 20px;
+    /* 여백 추가 */
+    border: 1px solid #ccc;
+    /* 테두리 추가 */
+    border-radius: 8px;
+    /* 모서리 둥글게 */
+    margin: 10px;
+    /* 외부 여백 */
+    background: rgba(40, 40, 40, 0.95);
+    /* 배경색 */
 }
 
 /* 스크롤바 스타일링 */
@@ -304,6 +319,7 @@ h1 {
     background: rgba(220, 53, 69, 0.7);
     color: white;
 }
+
 /* movie-info 클래스 스타일 제거 */
 .movie-info {
     display: flex;
@@ -314,6 +330,7 @@ h1 {
     height: 100%;
     color: #ffffff;
 }
+
 /* 선택된 영화 정보 스타일 */
 .selected-movie-info {
     width: 90%;
@@ -406,7 +423,7 @@ h1 {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     color: #ffffff;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .selected-seats {
@@ -619,4 +636,45 @@ h1 {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     background-color: #ff4444;
+}
+.movie-container{
+    width: 100%;
+    box-sizing: border-box;
+}
+.inner-movie-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    width: 100%;
+}
+
+/* 영화 항목 스타일 */
+.movie-wrap {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-start;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 30px;
+    width: 70%;
+    background-color: #1e1e1e;
+
+}
+.movie-poster2{
+    margin: 10px 20px;
+    width: 300px;
+    height: 400px;
+}
+.movie-info-text{
+    width: 300px;
+    padding-top: 30px;
+}
+
+/*이벤트 탭 크기조정*/
+.event-container{
+    width: 100%;
+    box-sizing: border-box;
 }
