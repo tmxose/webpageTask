@@ -83,17 +83,18 @@ body, html {
     transform: scaleX(1);
 }
 .mypage-container {
-    margin: 48px auto 0 auto;
+    margin: 40px auto 0 auto;
     padding: 2.5rem 2rem 2rem 2rem;
     display: flex;
     flex-direction: column;
     gap: 2.5rem;
     background: #232323;
-    border-radius: 0 0 18px 18px;
+    border-radius: 18px;
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
     min-width: 1200px;
     max-width: 1200px;
     width: 1200px;
+    box-sizing: border-box;
 }
 .user-info, .point-charge, .reservation-history {
     background: #232323;
@@ -133,10 +134,13 @@ body, html {
     flex: 1;
     padding: 0.8rem;
     background: rgba(255, 255, 255, 0.08);
-    border: 1px solid #00bfff;
+    border: 1px solid #e53935;
     border-radius: 4px;
     font-size: 1rem;
     color: #fff;
+    font-family: 'Noto Sans KR', Arial, sans-serif;
+    font-weight: bold;
+    letter-spacing: 0.5px;
 }
 .charge-form input::placeholder {
     color: rgba(255, 255, 255, 0.5);
@@ -153,6 +157,21 @@ body, html {
 }
 .charge-form button:hover {
     background-color: #b71c1c;
+}
+.charge-form input:focus {
+    outline: none;
+    border-color: #ff3333;
+    background-color: #1a1a1a;
+    box-shadow: 0 0 8px rgba(255, 51, 51, 0.2);
+    color: #fff;
+}
+.charge-form input:-webkit-autofill,
+.charge-form input:-webkit-autofill:hover,
+.charge-form input:-webkit-autofill:focus,
+.charge-form input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #1a1a1a inset !important;
+    -webkit-text-fill-color: #fff !important;
+    transition: background-color 5000s ease-in-out 0s;
 }
 .point-codes {
     background: #2a2323;

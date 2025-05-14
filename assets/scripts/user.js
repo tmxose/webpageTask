@@ -30,19 +30,38 @@ function getCurrentUser() {
   return null;
 }
 
-//   로그인한 사용자 정보 가져오기
+//   로그인한 사용자 정보 가져오기 (항상 객체 반환)
 function getCurrentUserInfo() {
   const users = getUsers();
-  const currentUser = getCurrentUser();
-  return users.find((u) => u.username === currentUser);
+  const currentUserId = getCurrentUser();
+  return users.find((u) => u.username === currentUserId);
 }
 
 //   회원가입 함수
 function register() {
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+
+  // 입력값 유효성 검사
+  if (!username || !password || !name || !email) {
+    alert("모든 필드를 입력해주세요.");
+    return;
+  }
+
+  // 이메일 형식 검사
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert("올바른 이메일 형식을 입력해주세요.");
+    return;
+  }
+
+  // 비밀번호 길이 검사
+  if (password.length < 6) {
+    alert("비밀번호는 6자 이상이어야 합니다.");
+    return;
+  }
 
   const users = getUsers();
 
@@ -79,6 +98,7 @@ function login() {
   if (user) {
     sessionStorage.setItem('isLoggedIn', 'true');
     sessionStorage.setItem('currentUser', id);
+    setCurrentUser(id);
     alert("로그인 성공!");
     location.href = "main.html";
   } else {
@@ -110,32 +130,20 @@ function goMainPage() {
 }
 
 //   페이지 로드 시 로그인 상태 반영
-$(document).ready(function() {
-  function updateUserInterface() {
-    const loginUl = document.querySelector("#header-logo ul");
-    const user = getCurrentUserInfo();
-    //console.log("현재 사용자 정보:", user); // 디버깅용
-
-    if (user && loginUl) {
-      loginUl.innerHTML = `
-        <li><a href="mypage.html">마이페이지</a></li>
-        <li><a href="#" onclick="logout()">로그아웃</a></li>
-      `;
-
-      // 메인 페이지나 마이페이지에 사용자 정보 표시
-      const userInfoDiv = document.getElementById("user-info");
-      if (userInfoDiv) {
-        userInfoDiv.innerText = `환영합니다, ${user.name}님 (보유 포인트: ${user.points}P)`;
-      }
+function updateUserInterface() {
+  const loginUl = document.querySelector("#header-logo ul");
+  const user = getCurrentUserInfo();
+  if (user && loginUl) {
+    loginUl.innerHTML = `
+      <li><a href="mypage.html">마이페이지</a></li>
+      <li><a href="#" onclick="logout()">로그아웃</a></li>
+    `;
+    const userInfoDiv = document.getElementById("user-info");
+    if (userInfoDiv) {
+      userInfoDiv.innerText = `환영합니다, ${user.name}님 (보유 포인트: ${user.points}P)`;
     }
   }
-
-  // 헤더 로드 완료 후 실행
-  $("#header-container").load("header.html", function() {
-    updateUserInfo();
-    updateUserInterface();
-  });
-});
+}
 
 // 포인트 충전
 function chargePoints(username, pointCode) {
@@ -229,3 +237,16 @@ function renderNavLinks() {
 }
 
 document.addEventListener('DOMContentLoaded', renderNavLinks);
+
+// 특정 사용자 삭제 함수
+function deleteUser(username) {
+  const users = getUsers();
+  const updatedUsers = users.filter(user => user.username !== username);
+  saveUsers(updatedUsers);
+  return true;
+}
+
+// 관리자용 전체 사용자 목록 조회 함수
+function getAllUsers() {
+  return getUsers();
+}

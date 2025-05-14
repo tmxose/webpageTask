@@ -13,12 +13,12 @@ $(document).ready(function() {
     const headerContent = sessionStorage.getItem('headerContent');
     
     if (headerContent) {
-        // 저장된 헤더가 있으면 바로 사용
         $("#header-container").html(headerContent);
+        updateUserInterface(); // 사용자 정보 갱신
     } else {
-        // 없으면 새로 로드하고 저장
         $("#header-container").load("header.html", function() {
             sessionStorage.setItem('headerContent', $("#header-container").html());
+            updateUserInterface(); // 사용자 정보 갱신
         });
     }
 });
@@ -128,3 +128,25 @@ $(document).ready(function() {
 function moveToMain(){
     location.href = "main.html";
 }
+
+// 영화 카드 클릭 이벤트
+$('.movie-card').click(function() {
+    const movieId = $(this).data('movie-id');
+    const movieTitle = $(this).find('.movie-title').text();
+    const moviePoster = $(this).find('img').attr('src');
+    
+    // 예매 페이지로 이동
+    location.href = `reserve.html?movieId=${movieId}&title=${encodeURIComponent(movieTitle)}&poster=${encodeURIComponent(moviePoster)}`;
+});
+
+// 바로예매 버튼 클릭 이벤트
+$('.reserve-btn').click(function(e) {
+    e.stopPropagation(); // 이벤트 버블링 방지
+    const movieCard = $(this).closest('.movie-card');
+    const movieId = movieCard.data('movie-id');
+    const movieTitle = movieCard.find('.movie-title').text();
+    const moviePoster = movieCard.find('img').attr('src');
+    
+    // 예매 페이지로 이동
+    location.href = `reserve.html?movieId=${movieId}&title=${encodeURIComponent(movieTitle)}&poster=${encodeURIComponent(moviePoster)}`;
+});

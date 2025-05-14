@@ -1,20 +1,27 @@
 // 예매 관련 상수
-const TICKET_PRICE = 10000; // 티켓 가격
+const TICKET_PRICE = 12000; // 티켓 가격
 const SEATS_PER_ROW = 10;   // 한 줄당 좌석 수
 const TOTAL_ROWS = 8;       // 총 좌석 줄 수
 
 // 예매 상태 저장
 let reservationState = {
-    selectedRegion: null,
-    selectedTheater: null,
-    selectedMovie: null,
-    selectedTime: null,
-    selectedSeats: [],
+    region: null,
+    theater: null,
+    movie: null,
+    time: null,
+    seats: [],
+    personCount: 1
+};
+
+let currentReserveInfo = {
+    movieTitle: '',
+    theater: '',
+    time: '',
     personCount: 1
 };
 
 // 페이지 로드 시 실행
-$(document).ready(function() {
+$(document).ready(function () {
     // 로그인 체크
     if (!getCurrentUser()) {
         alert("로그인 후 이용해주세요.");
@@ -22,55 +29,91 @@ $(document).ready(function() {
         return;
     }
 
-    initializeReservation();
-});
+    // 초기 상태 설정
+    $('.region-tab').first().addClass('active');
+    reservationState.region = $('.region-tab').first().data('region');
+    loadTheaters(reservationState.region);
+    $('#next-to-seat').prop('disabled', true);
 
-// 예매 초기화
-function initializeReservation() {
+    // 영화 목록 로드
+    loadMovies(); // 동적으로 영화 목록 로드
+
+    // URL 파라미터에서 영화 정보 가져오기
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieId = urlParams.get('movieId');
+    const movieTitle = urlParams.get('title');
+    const moviePoster = urlParams.get('poster');
+
+    if (movieId && movieTitle && moviePoster) {
+        reservationState.movie = {
+            id: movieId,
+            title: movieTitle,
+            poster: moviePoster
+        };
+        $(`.movie-item[data-movie-id="${movieId}"]`).addClass('selected');
+    }
+
     // 지역 탭 이벤트
-    $('.region-tab').on('click', function() {
+    $('.region-tab').click(function () {
         $('.region-tab').removeClass('active');
         $(this).addClass('active');
-        reservationState.selectedRegion = $(this).data('region');
-        loadTheaters(reservationState.selectedRegion);
+        reservationState.region = $(this).data('region');
+        loadTheaters(reservationState.region);
     });
 
-    // 다음 버튼 이벤트
-    $('#next-to-movie').on('click', function() {
-        if (reservationState.selectedTheater) {
-            $('#region-selection').hide();
-            $('#movie-selection').show();
-            loadMovies();
+    // 영화관 선택 이벤트
+    $('.theater-item').click(function () {
+        $('.theater-item').removeClass('selected');
+        $(this).addClass('selected');
+        reservationState.theater = $(this).data('theater');
+        checkNextButtonState();
+    });
+
+    // 인원 선택 이벤트
+    $('.count-btn').click(function () {
+        const action = $(this).hasClass('minus') ? 'decrease' : 'increase';
+        if (action === 'decrease' && reservationState.personCount > 1) {
+            reservationState.personCount--;
+        } else if (action === 'increase' && reservationState.personCount < 8) {
+            reservationState.personCount++;
         }
+        $('#person-count').text(reservationState.personCount);
+        updateTotalPrice();
     });
 
-    $('#next-to-seat').on('click', function() {
-        if (reservationState.selectedMovie && reservationState.selectedTime) {
-            $('#movie-selection').hide();
+    // 다음 버튼 클릭 이벤트
+    $('#next-to-seat').click(function () {
+        if (!$(this).prop('disabled')) {
+            // 1) 현재 선택된 정보를 reservationState에서 바로 읽어서 업데이트
+            showSelectedInfo(
+                reservationState.movie.title,
+                reservationState.theater,
+                reservationState.time,
+                reservationState.personCount
+            );
+
+            // 2) 섹션 전환
+            $('.reserve-section').hide();
             $('#seat-selection').show();
-            showSelectedMovieInfo();
+
+            // 3) 좌석 로드
             loadSeats();
         }
     });
 
-    // 인원 선택 이벤트
-    $('.count-btn.minus').on('click', function() {
-        if (reservationState.personCount > 1) {
-            reservationState.personCount--;
-            updatePersonCount();
-        }
+    // 이전 버튼 클릭 이벤트
+    $('#prev-to-movie').click(function () {
+        $('#seat-selection').hide();
+        $('.reserve-section').first().show();
     });
 
-    $('.count-btn.plus').on('click', function() {
-        if (reservationState.personCount < 8) {
-            reservationState.personCount++;
-            updatePersonCount();
+    // 예매 완료 버튼 클릭 이벤트
+    $('#complete-reservation').click(function () {
+        if (!$(this).prop('disabled')) {
+            completeReservation();
         }
     });
-
-    // 예매 완료 버튼
-    $('#complete-reservation').on('click', completeReservation);
-}
+});
 
 // 극장 목록 로드
 function loadTheaters(region) {
@@ -87,19 +130,25 @@ function loadTheaters(region) {
 
     theaters[region].forEach(theater => {
         const theaterDiv = $(`<div class="theater-item">${theater}</div>`);
-        theaterDiv.on('click', function() {
+        theaterDiv.on('click', function () {
             $('.theater-item').removeClass('selected');
             $(this).addClass('selected');
-            reservationState.selectedTheater = theater;
-            $('#next-to-movie').prop('disabled', false);
+            reservationState.theater = theater;
+            checkNextButtonState();
         });
         theaterList.append(theaterDiv);
     });
+    //   여기를 추가
+    const firstTh = theaterList.find('.theater-item').first();
+    if (firstTh.length) {
+        firstTh.addClass('selected');
+        reservationState.theater = firstTh.text();  // 또는 .data('theater')
+        checkNextButtonState();
+    }
 }
 
-// 영화 목록 로드
+// 영화 목록 및 시간표 로드
 function loadMovies() {
-    // 실제 구현에서는 서버에서 데이터를 가져와야 함
     const movies = [
         { id: 1, title: '진격의 거인', poster: 'movie1.png' },
         { id: 2, title: '미키17', poster: 'movie2.jpg' },
@@ -113,38 +162,66 @@ function loadMovies() {
     movies.forEach(movie => {
         const movieDiv = $(`
             <div class="movie-item" data-movie-id="${movie.id}">
-                <img src="assets/images/movie/${movie.poster}" alt="${movie.title}">
-                <h3>${movie.title}</h3>
+                <div class="movie-poster">
+                    <img src="assets/images/movie/${movie.poster}" alt="${movie.title}">
+                </div>
+                <div class="movie-info">
+                    <h3 class="movie-title">${movie.title}</h3>
+                    <div class="time-table"></div>
+                </div>
             </div>
         `);
-        movieDiv.on('click', function() {
+
+        // 1) 영화 클릭 핸들러: 영화 선택, 이전 시간 초기화
+        movieDiv.on('click', () => {
+            console.log('영화 선택:', movie.title);
+            // 영화 선택 표시
             $('.movie-item').removeClass('selected');
-            $(this).addClass('selected');
-            reservationState.selectedMovie = movie;
-            loadTimeTable(movie.id);
+            movieDiv.addClass('selected');
+            // 상태 초기화
+            reservationState.movie = movie;
+            reservationState.time = null;
+            // 모든 시간 선택 해제
+            $('.time-item').removeClass('selected');
+            checkNextButtonState();
         });
+
+        // 2) 시간 버튼 생성 & 클릭 핸들러
+        const times = ['10:00', '13:00', '16:00', '19:00', '22:00'];
+        times.forEach((time, idx) => {
+            const btn = $(`<div
+                class="time-item"
+                data-time="${time}"
+                id="time-${movie.id}-${idx}"
+            >${time}</div>`);
+
+            btn.on('click', e => {
+                e.stopPropagation(); // 영화 클릭 이벤트 방지
+
+                // 기존 모든 시간 선택 해제 (다른 영화 포함)
+                $('.time-item').removeClass('selected');
+                // 클릭된 버튼만 selected
+                btn.addClass('selected');
+
+                // 클릭된 영화도 selected 표시
+                $('.movie-item').removeClass('selected');
+                movieDiv.addClass('selected');
+
+                // 상태 저장
+                reservationState.movie = movie;
+                reservationState.time = time;
+
+                console.log('시간 선택:', time, '영화:', movie.title);
+                checkNextButtonState();
+            });
+
+            movieDiv.find('.time-table').append(btn);
+        });
+
         movieList.append(movieDiv);
     });
 }
 
-// 상영 시간표 로드
-function loadTimeTable(movieId) {
-    // 실제 구현에서는 서버에서 데이터를 가져와야 함
-    const times = ['10:00', '12:30', '15:00', '17:30', '20:00'];
-    const timeTable = $('.time-table');
-    timeTable.empty();
-
-    times.forEach(time => {
-        const timeDiv = $(`<div class="time-item">${time}</div>`);
-        timeDiv.on('click', function() {
-            $('.time-item').removeClass('selected');
-            $(this).addClass('selected');
-            reservationState.selectedTime = time;
-            $('#next-to-seat').prop('disabled', false);
-        });
-        timeTable.append(timeDiv);
-    });
-}
 
 // 좌석 로드
 function loadSeats() {
@@ -165,13 +242,13 @@ function loadSeats() {
                     ${isReserved ? 'X' : ''}
                 </div>
             `);
-            
+
             if (!isReserved) {
-                seatDiv.on('click', function() {
+                seatDiv.on('click', function () {
                     toggleSeatSelection($(this));
                 });
             }
-            
+
             rowDiv.append(seatDiv);
         }
         seatContainer.append(rowDiv);
@@ -181,19 +258,19 @@ function loadSeats() {
 // 좌석 선택 토글
 function toggleSeatSelection(seatElement) {
     const seatId = seatElement.data('seat-id');
-    const index = reservationState.selectedSeats.indexOf(seatId);
+    const index = reservationState.seats.indexOf(seatId);
 
     if (index === -1) {
-        if (reservationState.selectedSeats.length < reservationState.personCount) {
+        if (reservationState.seats.length < reservationState.personCount) {
             seatElement.addClass('selected');
-            reservationState.selectedSeats.push(seatId);
+            reservationState.seats.push(seatId);
         } else {
             alert('선택한 인원 수만큼만 좌석을 선택할 수 있습니다.');
             return;
         }
     } else {
         seatElement.removeClass('selected');
-        reservationState.selectedSeats.splice(index, 1);
+        reservationState.seats.splice(index, 1);
     }
 
     updateSeatInfo();
@@ -201,22 +278,22 @@ function toggleSeatSelection(seatElement) {
 
 // 좌석 정보 업데이트
 function updateSeatInfo() {
-    const totalPrice = reservationState.selectedSeats.length * TICKET_PRICE;
-    $('.selected-seats').text(`선택한 좌석: ${reservationState.selectedSeats.join(', ')}`);
+    const totalPrice = reservationState.seats.length * TICKET_PRICE;
+    $('.selected-seats').text(`선택한 좌석: ${reservationState.seats.join(', ')}`);
     $('.total-price').text(`총 금액: ${totalPrice.toLocaleString()}원`);
-    $('#complete-reservation').prop('disabled', reservationState.selectedSeats.length === 0);
+    $('#complete-reservation').prop('disabled', reservationState.seats.length === 0);
 }
 
 // 인원 수 업데이트
 function updatePersonCount() {
     $('#person-count').text(reservationState.personCount);
-    if (reservationState.selectedSeats.length > reservationState.personCount) {
+    if (reservationState.seats.length > reservationState.personCount) {
         // 선택된 좌석이 인원 수보다 많으면 초과분 제거
-        const excessSeats = reservationState.selectedSeats.slice(reservationState.personCount);
+        const excessSeats = reservationState.seats.slice(reservationState.personCount);
         excessSeats.forEach(seatId => {
             $(`.seat[data-seat-id="${seatId}"]`).removeClass('selected');
         });
-        reservationState.selectedSeats = reservationState.selectedSeats.slice(0, reservationState.personCount);
+        reservationState.seats = reservationState.seats.slice(0, reservationState.personCount);
         updateSeatInfo();
     }
 }
@@ -224,7 +301,7 @@ function updatePersonCount() {
 // 예매 완료
 function completeReservation() {
     const user = getCurrentUserInfo();
-    const totalPrice = reservationState.selectedSeats.length * TICKET_PRICE;
+    const totalPrice = reservationState.seats.length * TICKET_PRICE;
 
     if (user.points < totalPrice) {
         alert('포인트가 부족합니다. 마이페이지에서 포인트를 충전해주세요.\n\n포인트 충전 코드:\nPOINT10000: 1만 포인트\nPOINT100000: 10만 포인트');
@@ -235,10 +312,10 @@ function completeReservation() {
     // 예매 정보 저장
     const reservation = {
         userId: user.username,
-        theater: reservationState.selectedTheater,
-        movie: reservationState.selectedMovie,
-        time: reservationState.selectedTime,
-        seats: reservationState.selectedSeats,
+        theater: reservationState.theater,
+        movie: reservationState.movie,
+        time: reservationState.time,
+        seats: reservationState.seats,
         totalPrice: totalPrice,
         date: new Date().toISOString()
     };
@@ -268,9 +345,9 @@ function saveReservation(reservation) {
 function getReservedSeats() {
     const reservations = JSON.parse(localStorage.getItem('reservations') || '[]');
     return reservations
-        .filter(r => r.theater === reservationState.selectedTheater && 
-                     r.movie.id === reservationState.selectedMovie.id &&
-                     r.time === reservationState.selectedTime)
+        .filter(r => r.theater === reservationState.theater &&
+            r.movie.id === reservationState.movie.id &&
+            r.time === reservationState.time)
         .flatMap(r => r.seats);
 }
 
@@ -278,13 +355,13 @@ function getReservedSeats() {
 function createSeats() {
     const seatContainer = $('.seat-container');
     seatContainer.empty();
-    
+
     // A부터 J까지의 행 생성
     const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-    
+
     rows.forEach(row => {
         const seatRow = $('<div class="seat-row"></div>');
-        
+
         // 1부터 12까지의 열 생성
         for (let col = 1; col <= 12; col++) {
             const seatNumber = `${row}${col}`;
@@ -293,22 +370,22 @@ function createSeats() {
                     ${seatNumber}
                 </div>
             `);
-            
+
             // 랜덤으로 예약된 좌석 생성 (실제로는 서버에서 받아와야 함)
             if (Math.random() < 0.2) {
                 seat.addClass('reserved');
             }
-            
-            seat.on('click', function() {
+
+            seat.on('click', function () {
                 if (!$(this).hasClass('reserved')) {
                     $(this).toggleClass('selected');
                     updateSelectedSeats();
                 }
             });
-            
+
             seatRow.append(seat);
         }
-        
+
         seatContainer.append(seatRow);
     });
 }
@@ -318,84 +395,116 @@ function updateSelectedSeats() {
     const selectedSeats = $('.seat.selected');
     const selectedSeatsContainer = $('.selected-seats');
     const totalPrice = $('.total-price');
-    
+
     selectedSeatsContainer.empty();
-    selectedSeats.each(function() {
+    selectedSeats.each(function () {
         const seatSpan = $(`<span>${$(this).data('seat')}</span>`);
         selectedSeatsContainer.append(seatSpan);
     });
-    
+
     const price = selectedSeats.length * 10000; // 1인당 10,000원
     totalPrice.text(`총 금액: ${price.toLocaleString()}원`);
-    
+
     // 예매하기 버튼 활성화/비활성화
     $('#complete-reservation').prop('disabled', selectedSeats.length === 0);
 }
 
 // 상영관 정보 업데이트
 function updateTheaterInfo(movieTitle, theaterNumber, showtime) {
-    const theaterInfo = document.querySelector('.theater-info');
-    theaterInfo.querySelector('.movie-title').textContent = movieTitle;
-    theaterInfo.querySelector('.theater-number').textContent = `${theaterNumber}관`;
-    theaterInfo.querySelector('.showtime').textContent = showtime;
+    let theaterInfo = document.querySelector('.theater-info');
+    console.log(movieTitle);
+    console.log(theaterNumber);
+    console.log(showtime);
+    if (theaterInfo) {
+        //theaterInfo.querySelector('.movie-title').textContent = movieTitle;
+        theaterInfo.querySelector('.theater-number').textContent = `${theaterNumber}관`;
+        theaterInfo.querySelector('.showtime').textContent = showtime;
+    } else {
+        console.error('Theater info element not found.');
+    }
 }
 
-// 영화 선택 시 상영 시간표 업데이트
-function updateShowtimes(movieId) {
-    const timeTable = document.querySelector('.time-table');
-    timeTable.innerHTML = '';
-    
-    // 실제로는 서버에서 받아와야 하는 데이터
-    const showtimes = [
-        { time: '10:00', theater: 1 },
-        { time: '13:00', theater: 3 },
-        { time: '16:00', theater: 5 },
-        { time: '19:00', theater: 7 }
-    ];
-    
-    showtimes.forEach(showtime => {
-        const timeItem = document.createElement('div');
-        timeItem.className = 'time-item';
-        timeItem.textContent = `${showtime.time} (${showtime.theater}관)`;
-        
-        timeItem.addEventListener('click', () => {
-            document.querySelectorAll('.time-item').forEach(item => {
-                item.classList.remove('selected');
-            });
-            timeItem.classList.add('selected');
-            
-            // 좌석 선택 섹션으로 이동
-            document.getElementById('movie-selection').style.display = 'none';
-            document.getElementById('seat-selection').style.display = 'block';
-            
-            // 상영관 정보 업데이트
-            const movieTitle = document.querySelector('.movie-item.selected h3').textContent;
-            updateTheaterInfo(movieTitle, showtime.theater, showtime.time);
-            
-            // 좌석 생성
-            createSeats();
-        });
-        
-        timeTable.appendChild(timeItem);
-    });
-}
-
-// 이전 버튼 이벤트 리스너
-document.getElementById('prev-to-region').addEventListener('click', () => {
-    document.getElementById('movie-selection').style.display = 'none';
-    document.getElementById('region-selection').style.display = 'block';
-});
-
-document.getElementById('prev-to-movie').addEventListener('click', () => {
-    document.getElementById('seat-selection').style.display = 'none';
-    document.getElementById('movie-selection').style.display = 'block';
-});
-
-// 좌석 선택 섹션으로 이동 시 선택된 영화 정보 표시
-function showSelectedMovieInfo() {
-    const movieTitle = reservationState.selectedMovie.title;
-    const personCount = reservationState.personCount;
-    
-    $('.selected-movie-info .movie-title').text(movieTitle);
+// 선택된 정보 표시 함수
+function showSelectedInfo(movieTitle, theater, time, personCount) {
+    $('.selected-movie-info .movie-info-title').text(movieTitle);
+    $('.selected-movie-info .theater-number').text(`${theater}관`);
+    $('.selected-movie-info .showtime').text(time);
     $('.selected-movie-info .person-count-info').text(`인원: ${personCount}명`);
+
+    // currentReserveInfo 객체 업데이트
+    currentReserveInfo.movieTitle = movieTitle;
+    currentReserveInfo.theater = theater;
+    currentReserveInfo.time = time;
+    currentReserveInfo.personCount = personCount;
+}
+
+// DOMContentLoaded 이벤트 리스너
+document.addEventListener('DOMContentLoaded', () => {
+    // 지역 탭 클릭 이벤트
+    $('.region-tab').click(function () {
+        $('.region-tab').removeClass('active');
+        $(this).addClass('active');
+        reservationState.region = $(this).data('region');
+        loadTheaters(reservationState.region);
+    });
+
+    // 영화관 선택 이벤트
+    $('.theater-item').click(function () {
+        $('.theater-item').removeClass('selected');
+        $(this).addClass('selected');
+        reservationState.theater = $(this).data('theater');
+        checkNextButtonState();
+    });
+
+    // 이전 버튼 이벤트 리스너
+    document.getElementById('prev-to-region').addEventListener('click', () => {
+        const movieSelection = document.getElementById('movie-selection');
+        const regionSelection = document.getElementById('region-selection');
+
+        if (movieSelection && regionSelection) {
+            movieSelection.style.display = 'none';
+            regionSelection.style.display = 'block';
+        }
+    });
+
+    document.getElementById('prev-to-movie').addEventListener('click', () => {
+        const seatSelection = document.getElementById('seat-selection');
+        const movieSelection = document.getElementById('movie-selection');
+
+        if (seatSelection && movieSelection) {
+            seatSelection.style.display = 'none';
+            movieSelection.style.display = 'block';
+        }
+    });
+});
+
+// 선택된 영화 정보 표시
+function showSelectedMovieInfo() {
+    $('.selected-movie-info .movie-title').text(reservationState.movie.title);
+    $('.selected-movie-info .person-count-info').text(`인원: ${reservationState.personCount}명`);
+    $('.theater-info .theater-number').text(`${reservationState.theater}관`);
+    $('.theater-info .showtime').text(reservationState.time);
+}
+
+// 다음 버튼 상태 확인
+function checkNextButtonState() {
+    console.log(
+        '현재 상태 →',
+        'region:', reservationState.region,
+        'theater:', reservationState.theater,
+        'movie:', reservationState.movie ? reservationState.movie.title : null,
+        'time:', reservationState.time
+    );
+    const nextBtn = $('#next-to-seat');
+    if (reservationState.theater && reservationState.movie && reservationState.time) {
+        nextBtn.prop('disabled', false);
+    } else {
+        nextBtn.prop('disabled', true);
+    }
+}
+
+// 총 가격 업데이트
+function updateTotalPrice() {
+    const totalPrice = TICKET_PRICE * reservationState.personCount;
+    $('.total-price').text(`총 금액: ${totalPrice.toLocaleString()}원`);
 } 

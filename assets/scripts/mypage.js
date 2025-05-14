@@ -33,11 +33,9 @@ function loadReservations() {
 
 // 페이지 로드 시 실행
 $(document).ready(function() {
-    // 로그인 체크
-    if (!checkLoginStatus()) {
-        return;
-    }
-
+    $("#header-container").load("header.html", function() {
+        updateUserInterface(); // user.js에 정의된 함수
+    });
     // 사용자 정보 표시
     displayUserInfo();
     // 예매 내역 표시
@@ -46,13 +44,38 @@ $(document).ready(function() {
     setupPointCharge();
 });
 
-// 사용자 정보 표시
+function updateHeader() {
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+        // 로그인 상태일 때
+        const userInfo = `${currentUser.name}님 (보유 포인트: ${currentUser.points}P)`;
+        $("#user-info").text(userInfo);
+        
+        // 로그인/회원가입 링크를 로그아웃/마이페이지로 변경
+        const $ul = $("#header-logo ul");
+        $ul.empty();
+        $ul.append('<li><a href="mypage.html">마이페이지</a></li>');
+        $ul.append('<li><a href="#" onclick="logout(); return false;">로그아웃</a></li>');
+    } else {
+        // 로그인 상태가 아닐 때
+        $("#user-info").empty();
+        
+        // 로그아웃/마이페이지 링크를 로그인/회원가입으로 변경
+        const $ul = $("#header-logo ul");
+        $ul.empty();
+        $ul.append('<li><a href="login.html">로그인</a></li>');
+        $ul.append('<li><a href="signup.html">회원가입</a></li>');
+    }
+}
+
 function displayUserInfo() {
     const user = getCurrentUserInfo();
     if (user) {
-        $('#username').text(user.username);
-        $('#email').text(user.email);
-        $('#points').text(user.points.toLocaleString() + '원');
+        $("#username").text(user.username);
+        $("#email").text(user.email);
+        $("#points").text(user.points + "P");
+    } else {
+        window.location.href = "login.html";
     }
 }
 
@@ -61,7 +84,11 @@ function displayReservations() {
     const user = getCurrentUser();
     if (!user) return;
 
-    const reservations = getUserReservations(user.username);
+    console.log(user);
+    console.log("함수진입은 했음?");
+    const reservations = getUserReservations(user);
+    console.log(reservations);
+    
     const reservationList = $('#reservation-list');
     reservationList.empty();
 
@@ -114,4 +141,9 @@ function setupPointCharge() {
             alert('유효하지 않은 포인트 충전 코드입니다.\n\n사용 가능한 코드:\nPOINT10000: 1만 포인트\nPOINT100000: 10만 포인트');
         }
     });
+}
+
+function getUserReservations(userId) {
+    const reservations = JSON.parse(localStorage.getItem('reservations') || '[]');
+    return reservations.filter(reservation => reservation.userId === userId);
 } 
