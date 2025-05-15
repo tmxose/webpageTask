@@ -2,9 +2,9 @@
 
 // 사용자 관련 상수
 const POINT_CODES = {
-    'POINT1000': 1000,
-    'POINT10000': 10000,  // 1만 포인트 충전 코드
-    'POINT100000': 100000 // 10만 포인트 충전 코드
+  POINT1000: 1000,
+  POINT10000: 10000, // 1만 포인트 충전 코드
+  POINT100000: 100000, // 10만 포인트 충전 코드
 };
 
 //  전체 사용자 데이터 저장
@@ -24,8 +24,8 @@ function setCurrentUser(username) {
 
 //   로그인한 사용자 ID 가져오기
 function getCurrentUser() {
-  if (sessionStorage.getItem('isLoggedIn') === 'true') {
-    return sessionStorage.getItem('currentUser');
+  if (sessionStorage.getItem("isLoggedIn") === "true") {
+    return sessionStorage.getItem("currentUser");
   }
   return null;
 }
@@ -90,14 +90,14 @@ function register() {
 
 //   로그인 함수
 function login() {
-  const id = document.getElementById('login-id').value;
-  const pw = document.getElementById('login-pw').value;
- 
+  const id = document.getElementById("login-id").value;
+  const pw = document.getElementById("login-pw").value;
+
   const users = getUsers();
-  const user = users.find(u => u.username === id && u.password === pw);
+  const user = users.find((u) => u.username === id && u.password === pw);
   if (user) {
-    sessionStorage.setItem('isLoggedIn', 'true');
-    sessionStorage.setItem('currentUser', id);
+    sessionStorage.setItem("isLoggedIn", "true");
+    sessionStorage.setItem("currentUser", id);
     setCurrentUser(id);
     alert("로그인 성공!");
     location.href = "main.html";
@@ -106,21 +106,19 @@ function login() {
   }
 }
 
-
 //   사용자 정보 업데이트 함수 (ex: 마이페이지에서 사용)
 function updateUserInfo() {
   const user = getCurrentUserInfo();
   const infoP = document.getElementById("info");
-  console.log(user);
+
   if (user && infoP) {
     infoP.innerHTML = `환영합니다, ${user.name}님 (보유 포인트: ${user.points}P)`;
-    console.log(user.points);
   }
 }
 //   로그아웃 함수
 function logout() {
-  sessionStorage.removeItem('isLoggedIn');
-  sessionStorage.removeItem('currentUser');
+  sessionStorage.removeItem("isLoggedIn");
+  sessionStorage.removeItem("currentUser");
   alert("로그아웃되었습니다.");
   location.href = "main.html"; // 메인으로 이동
 }
@@ -147,101 +145,104 @@ function updateUserInterface() {
 
 // 포인트 충전
 function chargePoints(username, pointCode) {
-    const users = getUsers();
-    const userIndex = users.findIndex(user => user.username === username);
-    
-    if (userIndex === -1) return false;
-    
-    // 포인트 코드 검증
-    if (!(pointCode in POINT_CODES)) {
-        return false;
-    }
-    
-    // 포인트 충전
-    const points = POINT_CODES[pointCode];
-    users[userIndex].points = (users[userIndex].points || 0) + points;
-    saveUsers(users);
-    return true;
+  const users = getUsers();
+  const userIndex = users.findIndex((user) => user.username === username);
+
+  if (userIndex === -1) return false;
+
+  // 포인트 코드 검증
+  if (!(pointCode in POINT_CODES)) {
+    return false;
+  }
+
+  // 포인트 충전
+  const points = POINT_CODES[pointCode];
+  users[userIndex].points = (users[userIndex].points || 0) + points;
+  saveUsers(users);
+  return true;
 }
 
 // 포인트 충전 코드 확인
 function validatePointCode(code) {
-    return POINT_CODES.hasOwnProperty(code);
+  return POINT_CODES.hasOwnProperty(code);
 }
 
 // 회원가입 처리
 function signup(username, password, email) {
-    const users = getUsers();
-    
-    // 이미 존재하는 사용자인지 확인
-    if (users.some(user => user.username === username)) {
-        return false;
-    }
-    
-    // 새 사용자 추가
-    users.push({
-        username,
-        password,
-        email,
-        points: 0,
-        reservations: []
-    });
-    
-    saveUsers(users);
-    return true;
+  const users = getUsers();
+
+  // 이미 존재하는 사용자인지 확인
+  if (users.some((user) => user.username === username)) {
+    return false;
+  }
+
+  // 새 사용자 추가
+  users.push({
+    username,
+    password,
+    email,
+    points: 0,
+    reservations: [],
+  });
+
+  saveUsers(users);
+  return true;
 }
 
 // 예매 정보 저장
 function saveReservation(reservation) {
-    const users = getUsers();
-    const userIndex = users.findIndex(user => user.username === reservation.userId);
-    
-    if (userIndex !== -1) {
-        users[userIndex].reservations.push(reservation);
-        saveUsers(users);
-        return true;
-    }
-    return false;
+  const users = getUsers();
+  const userIndex = users.findIndex(
+    (user) => user.username === reservation.userId
+  );
+
+  if (userIndex !== -1) {
+    users[userIndex].reservations.push(reservation);
+    saveUsers(users);
+    return true;
+  }
+  return false;
 }
 
 // 사용자의 예매 내역 가져오기
 function getUserReservations(username) {
-    const users = getUsers();
-    const user = users.find(u => u.username === username);
-    return user ? user.reservations : [];
+  const users = getUsers();
+  const user = users.find((u) => u.username === username);
+  return user ? user.reservations : [];
 }
 
 // 로그인 상태 체크
 function checkLoginStatus() {
-    const currentUser = getCurrentUser();
-    if (!currentUser) {
-        location.href = 'login.html';
-        return false;
-    }
-    return true;
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    location.href = "login.html";
+    return false;
+  }
+  return true;
 }
 
 // 네비게이션 동적 렌더링
 function renderNavLinks() {
-    const navLinks = document.querySelector('.nav-links');
-    if (!navLinks) return;
-    navLinks.innerHTML = '';
-    navLinks.innerHTML += '<li><a href="index.html">홈</a></li>';
-    navLinks.innerHTML += '<li><a href="reserve.html">예매</a></li>';
-    if (sessionStorage.getItem('isLoggedIn') === 'true') {
-        navLinks.innerHTML += '<li><a href="mypage.html">마이페이지</a></li>';
-        navLinks.innerHTML += '<li><a href="#" onclick="logout()">로그아웃</a></li>';
-    } else {
-        navLinks.innerHTML += '<li><a href="login.html">로그인</a></li>';
-    }
+  const navLinks = document.querySelector(".nav-links");
+  if (!navLinks) return;
+  navLinks.innerHTML = "";
+  navLinks.innerHTML += '<li><a href="index.html">홈</a></li>';
+  navLinks.innerHTML += '<li><a href="reserve.html">예매</a></li>';
+  if (sessionStorage.getItem("isLoggedIn") === "true") {
+    navLinks.innerHTML += '<li><a href="mypage.html">마이페이지</a></li>';
+    navLinks.innerHTML +=
+      '<li><a href="#" onclick="logout()">로그아웃</a></li>';
+  } else {
+    navLinks.innerHTML += '<li><a href="login.html">로그인</a></li>';
+  }
 }
 
-document.addEventListener('DOMContentLoaded', renderNavLinks);
+document.addEventListener("DOMContentLoaded", renderNavLinks);
 
 // 특정 사용자 삭제 함수
 function deleteUser(username) {
   const users = getUsers();
-  const updatedUsers = users.filter(user => user.username !== username);
+  const updatedUsers = users.filter((user) => user.username !== username);
   saveUsers(updatedUsers);
   return true;
 }
