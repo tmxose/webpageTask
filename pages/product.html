@@ -4,23 +4,42 @@
 
 <head>
     <title>상품 상세보기</title>
-    <link rel="stylesheet" href="/assets/styles/reserveTab.css" />
-    <link rel="stylesheet" href="assets/styles/main.css" />
+    <link rel="stylesheet" href="../assets/css/reserveTab.css" />
+    <link rel="stylesheet" href="../assets/css/main.css" />
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="assets/scripts/user.js"></script>
-    <script src="assets/scripts/main.js" defer></script>
+    <script src="../assets/js/user.js"></script>
+    <script src="../assets/js/main.js" defer></script>
 </head>
 
 <body>
     <div class="container">
         <!-- 공통 헤더 -->
-        <div id="header-container"></div>
+        <header>
+            <div class="header-back">
+              <div id="header-logo">
+                <a href="./index.html" class="logo-text">레드 시네마</a>
+                <div id="user-info" style="color: white; font-weight: bold"></div>
+                <ul>
+                  <li><a href="./login.html">로그인</a></li>
+                  <li><a href="./signup.html">회원가입</a></li>
+                </ul>
+              </div>
+              <div id="header-nav">
+                <ul>
+                  <li><a href="./reserve.html">예매</a></li>
+                  <li><a href="./movie.html">영화</a></li>
+                  <li><a href="./product.html">상품</a></li>
+                  <li><a href="./event.html">이벤트</a></li>
+                </ul>
+              </div>
+            </div>
+          </header>
 
         <div class="combo-container">
             <div class="inner-combo-container">
                 <h2>매점 패키지</h2>
                 <div class="combo-item-container">
-                    <img src="assets/images/package/package1.jpg" />
+                    <img src="../assets/images/package/package1.jpg" />
                     <div class="text-sorting-2nd">
                         <span>우리 패키지</span>
                         <strong>62,000원</strong>
@@ -29,7 +48,7 @@
                     </div>
                 </div>
                 <div class="combo-item-container">
-                    <img src="assets/images/package/package2.jpg" />
+                    <img src="../assets/images/package/package2.jpg" />
                     <div class="text-sorting-2nd">
                         <span>나랑 너 패키지</span>
                         <strong>35,000원</strong>
@@ -38,7 +57,7 @@
                     </div>
                 </div>
                 <div class="combo-item-container">
-                    <img src="assets/images/package/package3.jpg" />
+                    <img src="../assets/images/package/package3.jpg" />
                     <div class="text-sorting-2nd">
                         <span>좋은 날 패키지</span>
                         <strong>18,000원</strong>
@@ -50,7 +69,7 @@
             <div class="inner-combo-container">
                 <h2>영화관람권</h2>
                 <div class="combo-item-container">
-                    <img src="assets/images/ticket/ticket1.jpg" />
+                    <img src="../assets/images/ticket/ticket1.jpg" />
                     <div class="text-sorting-2nd">
                         <span>레드시네마 영화관람권</span>
                         <strong>13,000원</strong>
@@ -59,7 +78,7 @@
                     </div>
                 </div>
                 <div class="combo-item-container">
-                    <img src="assets/images/ticket/ticket2.jpg" />
+                    <img src="../assets/images/ticket/ticket2.jpg" />
                     <div class="text-sorting-2nd">
                         <span>IMAX 영화관람권</span>
                         <strong>18,000원</strong>
@@ -68,7 +87,7 @@
                     </div>
                 </div>
                 <div class="combo-item-container">
-                    <img src="assets/images/ticket/ticket3.jpg" />
+                    <img src="../assets/images/ticket/ticket3.jpg" />
                     <div class="text-sorting-2nd">
                         <span>4DX 영화관람권</span>
                         <strong>19,000원</strong>
@@ -80,7 +99,7 @@
             <div class="inner-combo-container">
                 <h2>기프트카드</h2>
                 <div class="combo-item-container">
-                    <img src="assets/images/giftcard/giftcard1.jpg" />
+                    <img src="../assets/images/giftcard/giftcard1.jpg" />
                     <div class="text-sorting-2nd">
                         <span>PACONNIE A형</span>
                         <strong>금액 충전형</strong>
@@ -89,7 +108,7 @@
                     </div>
                 </div>
                 <div class="combo-item-container">
-                    <img src="assets/images/giftcard/giftcard2.jpg" />
+                    <img src="../assets/images/giftcard/giftcard2.jpg" />
                     <div class="text-sorting-2nd">
                         <span>PACONNIE B형</span>
                         <strong>금액 충전형</strong>
@@ -98,7 +117,7 @@
                     </div>
                 </div>
                 <div class="combo-item-container">
-                    <img src="assets/images/giftcard/giftcard3.jpg" />
+                    <img src="../assets/images/giftcard/giftcard3.jpg" />
                     <div class="text-sorting-2nd">
                         <span>PACONNIE C형</span>
                         <strong>금액 충전형</strong>

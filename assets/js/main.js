@@ -7,28 +7,11 @@ const ANIMATION = {
     SLIDE_WIDTH: 20
 };
 
-// 헤더 로드 최적화
-$(document).ready(function() {
-    // 페이지 로드 전에 헤더를 미리 로드
-    const headerContent = sessionStorage.getItem('headerContent');
-    
-    if (headerContent) {
-        $("#header-container").html(headerContent);
-        updateUserInterface(); // 사용자 정보 갱신
-    } else {
-        $("#header-container").load("header.html", function() {
-            sessionStorage.setItem('headerContent', $("#header-container").html());
-            updateUserInterface(); // 사용자 정보 갱신
-        });
-    }
-});
-
-  // 공지사항 자동 스크롤
-$(document).ready(function() {
+// 공지사항 자동 스크롤 처리
+function initNoticeScroll() {
     const $noticeList = $(".notice-list");
     const $notices = $(".notice-list li");
     
-    // 예외 처리
     if (!$noticeList.length || !$notices.length) return;
     
     let noticeIndex = 0;
@@ -54,19 +37,16 @@ $(document).ready(function() {
 
     moveNotice();
     setInterval(moveNotice, ANIMATION.NOTICE_DELAY);
-});
+}
 
-// 광고 슬라이드
-$(document).ready(function() {
-    const $adContainer = $(".ad-container");
+// 광고 슬라이드 처리
+function initAdSlide() {
     const $adList = $(".ad-list");
     const $ads = $(".ad-list img");
     
-    // 예외 처리
     if (!$adList.length || !$ads.length) return;
     
     let adIndex = 0;
-    let slideInterval;
 
     function moveSlide() {
         adIndex++;
@@ -86,35 +66,24 @@ $(document).ready(function() {
         }
     }
 
-    // 자동 슬라이드 시작
-    function startSlide() {
-        slideInterval = setInterval(moveSlide, ANIMATION.AD_DELAY);
-    }
+    moveSlide();
+    setInterval(moveSlide, ANIMATION.AD_DELAY);
+}
 
-    // 초기 실행
-    moveSlide();  // 첫 번째 슬라이드 시작
-    startSlide(); // 자동 슬라이드 시작
-});
-
-// 현재 상영작과 상영 예정작 토글
-$(document).ready(function() {
+// 영화 탭 전환 처리
+function initMovieTabs() {
     const $movieTabs = $('.movies-type a');
     const $nowShowing = $('.now-showing');
     const $upcomingShowing = $('.upcoming-showing');
     
-    // 예외 처리
     if (!$movieTabs.length || !$nowShowing.length || !$upcomingShowing.length) return;
     
     $movieTabs.on('click', function(e) {
         e.preventDefault();
         
-        // 모든 탭에서 active 클래스 제거
         $movieTabs.removeClass('active');
-        
-        // 클릭된 탭에 active 클래스 추가
         $(this).addClass('active');
         
-        // 해당하는 섹션 표시
         if ($(this).data('type') === 'now') {
             $nowShowing.addClass('active');
             $upcomingShowing.removeClass('active');
@@ -123,30 +92,45 @@ $(document).ready(function() {
             $nowShowing.removeClass('active');
         }
     });
-});
+}
 
-function moveToMain(){
+// 영화 카드 클릭 이벤트 처리
+function initMovieCardEvents() {
+    $('.movie-card').click(function() {
+        const movieId = $(this).data('movie-id');
+        const movieTitle = $(this).find('.movie-title').text();
+        const moviePoster = $(this).find('img').attr('src');
+        
+        location.href = `reserve.html?movieId=${movieId}&title=${encodeURIComponent(movieTitle)}&poster=${encodeURIComponent(moviePoster)}`;
+    });
+
+    $('.reserve-btn').click(function(e) {
+        e.stopPropagation();
+        const movieCard = $(this).closest('.movie-card');
+        const movieId = movieCard.data('movie-id');
+        const movieTitle = movieCard.find('.movie-title').text();
+        const moviePoster = movieCard.find('img').attr('src');
+        
+        location.href = `reserve.html?movieId=${movieId}&title=${encodeURIComponent(movieTitle)}&poster=${encodeURIComponent(moviePoster)}`;
+    });
+}
+
+// 페이지 초기화 함수
+function initMainPage() {
+    // 사용자 인터페이스 업데이트
+    updateUserInterface();
+    
+    // 각 기능 초기화
+    initNoticeScroll();
+    initAdSlide();
+    initMovieTabs();
+    initMovieCardEvents();
+}
+
+// 페이지 이동 함수
+function moveToMain() {
     location.href = "main.html";
 }
 
-// 영화 카드 클릭 이벤트
-$('.movie-card').click(function() {
-    const movieId = $(this).data('movie-id');
-    const movieTitle = $(this).find('.movie-title').text();
-    const moviePoster = $(this).find('img').attr('src');
-    
-    // 예매 페이지로 이동
-    location.href = `reserve.html?movieId=${movieId}&title=${encodeURIComponent(movieTitle)}&poster=${encodeURIComponent(moviePoster)}`;
-});
-
-// 바로예매 버튼 클릭 이벤트
-$('.reserve-btn').click(function(e) {
-    e.stopPropagation(); // 이벤트 버블링 방지
-    const movieCard = $(this).closest('.movie-card');
-    const movieId = movieCard.data('movie-id');
-    const movieTitle = movieCard.find('.movie-title').text();
-    const moviePoster = movieCard.find('img').attr('src');
-    
-    // 예매 페이지로 이동
-    location.href = `reserve.html?movieId=${movieId}&title=${encodeURIComponent(movieTitle)}&poster=${encodeURIComponent(moviePoster)}`;
-});
+// DOM이 로드되면 초기화
+$(document).ready(initMainPage);

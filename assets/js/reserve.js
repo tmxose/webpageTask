@@ -165,7 +165,7 @@ function loadMovies() {
     const movieDiv = $(`
             <div class="movie-item" data-movie-id="${movie.id}">
                 <div class="movie-poster">
-                    <img src="assets/images/movie/${movie.poster}" alt="${movie.title}">
+                    <img src="../assets/images/movie/${movie.poster}" alt="${movie.title}">
                 </div>
                 <div class="movie-info">
                     <h3 class="movie-title">${movie.title}</h3>

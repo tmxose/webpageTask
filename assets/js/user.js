@@ -19,15 +19,13 @@ function getUsers() {
 
 //   로그인한 사용자 ID 저장
 function setCurrentUser(username) {
-  localStorage.setItem("currentUser", username);
+  sessionStorage.setItem("currentUser", username);
+  sessionStorage.setItem("isLoggedIn", "true");
 }
 
 //   로그인한 사용자 ID 가져오기
 function getCurrentUser() {
-  if (sessionStorage.getItem("isLoggedIn") === "true") {
-    return sessionStorage.getItem("currentUser");
-  }
-  return null;
+  return sessionStorage.getItem("currentUser");
 }
 
 //   로그인한 사용자 정보 가져오기 (항상 객체 반환)
@@ -78,14 +76,14 @@ function register() {
     name,
     email,
     points: 0,
+    reservations: []
   };
 
   users.push(newUser);
   saveUsers(users);
 
   alert("회원가입 완료! 로그인 페이지로 이동합니다.");
-  // 로그인 페이지로 이동
-  location.href = "login.html";
+  location.href = "/pages/login.html";
 }
 
 //   로그인 함수
@@ -96,11 +94,9 @@ function login() {
   const users = getUsers();
   const user = users.find((u) => u.username === id && u.password === pw);
   if (user) {
-    sessionStorage.setItem("isLoggedIn", "true");
-    sessionStorage.setItem("currentUser", id);
     setCurrentUser(id);
     alert("로그인 성공!");
-    location.href = "main.html";
+    location.href = "./index.html";
   } else {
     alert("아이디 또는 비밀번호가 틀렸습니다.");
   }
@@ -120,28 +116,52 @@ function logout() {
   sessionStorage.removeItem("isLoggedIn");
   sessionStorage.removeItem("currentUser");
   alert("로그아웃되었습니다.");
-  location.href = "main.html"; // 메인으로 이동
-}
-// 메인 페이지 이동함수
-function goMainPage() {
-  location.href = "main.html";
+  location.href = "./index.html";
 }
 
-//   페이지 로드 시 로그인 상태 반영
+
+// 헤더의 사용자 인터페이스 업데이트
 function updateUserInterface() {
-  const loginUl = document.querySelector("#header-logo ul");
-  const user = getCurrentUserInfo();
-  if (user && loginUl) {
-    loginUl.innerHTML = `
-      <li><a href="mypage.html">마이페이지</a></li>
-      <li><a href="#" onclick="logout()">로그아웃</a></li>
-    `;
-    const userInfoDiv = document.getElementById("user-info");
-    if (userInfoDiv) {
-      userInfoDiv.innerText = `환영합니다, ${user.name}님 (보유 포인트: ${user.points}P)`;
+    const headerLogo = document.querySelector("#header-logo");
+    const user = getCurrentUserInfo();
+    
+    if (user && headerLogo) {
+        // 로그인 상태일 때
+        const userInfoDiv = headerLogo.querySelector("#user-info");
+        const loginUl = headerLogo.querySelector("ul");
+        
+        if (userInfoDiv) {
+            userInfoDiv.innerText = `환영합니다, ${user.name}님 (보유 포인트: ${user.points}P)`;
+        }
+        
+        if (loginUl) {
+            loginUl.innerHTML = `
+                <li><a href="mypage.html">마이페이지</a></li>
+                <li><a href="#" onclick="logout()">로그아웃</a></li>
+            `;
+        }
+    } else if (headerLogo) {
+        // 비로그인 상태일 때
+        const userInfoDiv = headerLogo.querySelector("#user-info");
+        const loginUl = headerLogo.querySelector("ul");
+        
+        if (userInfoDiv) {
+            userInfoDiv.innerText = "";
+        }
+        
+        if (loginUl) {
+            loginUl.innerHTML = `
+                <li><a href="login.html">로그인</a></li>
+                <li><a href="signup.html">회원가입</a></li>
+            `;
+        }
     }
-  }
 }
+
+// DOM이 로드되면 UI 업데이트
+document.addEventListener("DOMContentLoaded", function() {
+    updateUserInterface();
+});
 
 // 포인트 충전
 function chargePoints(username, pointCode) {
@@ -197,6 +217,9 @@ function saveReservation(reservation) {
   );
 
   if (userIndex !== -1) {
+    if (!users[userIndex].reservations) {
+      users[userIndex].reservations = [];
+    }
     users[userIndex].reservations.push(reservation);
     saveUsers(users);
     return true;
@@ -208,14 +231,14 @@ function saveReservation(reservation) {
 function getUserReservations(username) {
   const users = getUsers();
   const user = users.find((u) => u.username === username);
-  return user ? user.reservations : [];
+  return user ? (user.reservations || []) : [];
 }
 
 // 로그인 상태 체크
 function checkLoginStatus() {
   const currentUser = getCurrentUser();
   if (!currentUser) {
-    location.href = "login.html";
+    location.href = "/pages/login.html";
     return false;
   }
   return true;
