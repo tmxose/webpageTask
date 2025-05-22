@@ -12,20 +12,20 @@
 ## 📁 프로젝트 구조
 
 ```
-📦 TASK2
+📦 webpageTask-main
  ┣ 📂assets
  ┃ ┣ 📂images         # 광고, 영화, 패키지 이미지 등
- ┃ ┣ 📂scripts        # JS 로직 (메인/마이페이지/예매/유저관리)
- ┃ ┗ 📂styles         # CSS 파일
- ┣ 📜main.html        # 메인 페이지
- ┣ 📜movie.html       # 영화 페이지
- ┣ 📜reserve.html     # 영화 예매
- ┣ 📜mypage.html      # 마이페이지
- ┣ 📜login.html       # 로그인
- ┣ 📜signup.html      # 회원가입
- ┣ 📜product.html     # 상품 소개
- ┣ 📜event.html       # 이벤트 소개
- ┗ 📜header.html      # 공통 헤더 (JS로 삽입됨)
+ ┃ ┣ 📂js             # JS 로직 (메인/마이페이지/예매/유저관리)
+ ┃ ┗ 📂css            # CSS 파일
+ ┣ 📂pages
+ ┃ ┣ 📜index.html       # 메인 페이지
+ ┃ ┣ 📜movie.html       # 영화 페이지
+ ┃ ┣ 📜reserve.html     # 영화 예매
+ ┃ ┣ 📜mypage.html      # 마이페이지
+ ┃ ┣ 📜login.html       # 로그인
+ ┃ ┣ 📜signup.html      # 회원가입
+ ┃ ┣ 📜product.html     # 상품 소개
+ ┃ ┗ 📜event.html       # 이벤트 소개
 ```
 
 ---
@@ -34,7 +34,6 @@
 
 ### 1️⃣ 메인 페이지 (main.html)
 
-- 공통 헤더 (`header.html` 삽입, 탭 및 로그인/회원가입 연결)
 - **상영 중/상영 예정 영화 탭** (포스터 + 상세/예매 버튼)
 - **이벤트**: 3x2 그리드, 클릭 시 `event.html`로 이동
 - **패키지 상품** 소개 영역 (`product.html` 이동)
@@ -85,7 +84,7 @@
 ## 📌 실행 방법
 
 1. 이 저장소를 클론하거나 압축 해제합니다.
-2. `main.html` 파일을 브라우저로 실행합니다.
+2. `index.html` 파일을 브라우저로 실행합니다.
 
 ```bash
 git clone https://github.com/tmxose/webpageTask.git
