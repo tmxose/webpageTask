@@ -96,7 +96,7 @@ function login() {
   if (user) {
     setCurrentUser(id);
     alert("로그인 성공!");
-    location.href = "./index.html";
+    location.href = "../index.html";
   } else {
     alert("아이디 또는 비밀번호가 틀렸습니다.");
   }
@@ -116,7 +116,7 @@ function logout() {
   sessionStorage.removeItem("isLoggedIn");
   sessionStorage.removeItem("currentUser");
   alert("로그아웃되었습니다.");
-  location.href = "./index.html";
+  location.href = "../index.html";
 }
 
 
@@ -151,8 +151,8 @@ function updateUserInterface() {
         
         if (loginUl) {
             loginUl.innerHTML = `
-                <li><a href="login.html">로그인</a></li>
-                <li><a href="signup.html">회원가입</a></li>
+                <li><a href="./pages/login.html">로그인</a></li>
+                <li><a href="./pages/signup.html">회원가입</a></li>
             `;
         }
     }
